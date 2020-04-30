@@ -108,27 +108,22 @@ function wc_product_acf_location_rule_types_woocommerce_reviews_enabled($choices
 }
 
 function rule_match_woocommerce_bools($match, $rule, $options) {
-	$post_type = $options['post_type'];
-	if(!$post_type) {
-		if(!$options['post_id']) {
-			return false;
-		}
-		
-		$post_type = get_post_type($options['post_id']);
-	}
+	if(isset($options['post_type']) && isset($options['post_id']))
+		$post_type = $options['post_type'];
+
 	// Ensure is a product
 	if( $post_type != 'product') {
 		return false;
 	}
-	if(!array_key_exists('woocommerce_is_virtual', $options) && !array_key_exists('value', $rule)) {
+	if(!array_key_exists('woocommerce_'. $rule['value'], $options) && !array_key_exists('value', $rule)) {
 		return false;
 	}
 	$key = 'woocommerce_' . $rule['value'];
 	if($rule['operator'] == "==") {
-		$match = ( $options[$key] === 1 );
+		$match = ( $options[$key] === true );
 	}
 	elseif($rule['operator'] == "!=") {
-		$match = ( $options[$key] !== 1 );
+		$match = ( $options[$key] !== true );
 	}
 	return $match;
 }
