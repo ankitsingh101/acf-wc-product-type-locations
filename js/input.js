@@ -36,11 +36,6 @@
 		taxable_status();
 	});
 
-	$(document).on('change', '#product-type', function(){
-		acf.ajax.update( 'woocommerce_product_type', $(this).val() ).fetch();
-		$(document).trigger('acf/update_field_groups');
-	});
-
 	$(document).on('change', '#_virtual, #_downloadable, #_sold_individually', function() {
 		acf.ajax.update( 'woocommerce_is' + $(this).attr('name'), ($(this).is(':checked')) ? 1 : 0 ).fetch();
 		$(document).trigger('acf/update_field_groups');
