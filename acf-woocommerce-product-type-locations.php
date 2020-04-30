@@ -18,13 +18,11 @@ add_action('acf/input/admin_enqueue_scripts', 'acf_wc_input_admin_enqueue_script
 
 // Location Rules
 add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 1); 
-add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_location_rule_types_woocommerce_product_type', 50, 1);
 add_filter('acf/location/rule_values/woocommerce_variations', 'wc_product_acf_location_rule_types_woocommerce_variations', 50, 1);
 add_filter('acf/location/rule_values/woocommerce_taxation', 'wc_product_acf_location_rule_types_woocommerce_taxation', 50, 1);
 add_filter('acf/location/rule_values/woocommerce_reviews_enabled', 'wc_product_acf_location_rule_types_woocommerce_reviews_enabled', 50, 1);
 
-// Rule Validation
-add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
+// Rule Validation 
 add_filter('acf/location/rule_match/woocommerce_variations', 'rule_match_woocommerce_bools', 50, 3);
 add_filter('acf/location/rule_match/woocommerce_taxation', 'rule_match_woocommerce_bools', 50, 3);
 add_filter('acf/location/rule_match/woocommerce_reviews_enabled', 'rule_match_woocommerce_bools', 50, 3);
@@ -75,18 +73,11 @@ function acf_wc_input_admin_enqueue_scripts() {
 
 function wc_product_acf_location_rule_types($choices) {    
     $choices[__("Woocommerce")] = array(
-    	'woocommerce_product_type' => __("Product Type", 'acf'),
     	'woocommerce_variations' => __("Product Variations", 'acf'),
     	'woocommerce_taxation' => __("Product Taxation", 'acf'),
     	'woocommerce_reviews_enabled' => __("Product Reviews Enabled", 'acf')
     );
-
     return $choices;
-}
-
-function wc_product_acf_location_rule_types_woocommerce_product_type($choices) {
-	$choices = wc_get_product_types();
-	return $choices;
 }
 
 function wc_product_acf_location_rule_types_woocommerce_variations($choices) {
@@ -116,41 +107,8 @@ function wc_product_acf_location_rule_types_woocommerce_reviews_enabled($choices
 	return $choices;
 }
 
-function rule_match_woocommerce_product_type($match, $rule, $options) {
-
-	$post_type = $options['post_type'];
-
-	if(!$post_type) {
-		if(!$options['post_id']) {
-			return false;
-		}
-		
-		$post_type = get_post_type($options['post_id']);
-	}
-
-	// Ensure is a product
-	if( $post_type != 'product') {
-		return false;
-	}
-
-	// Ensure Product Type has been set
-	if(!array_key_exists('woocommerce_product_type', $options)) {
-		return false;
-	}
-
-	if($rule['operator'] == "==") {
-		$match = ( $options['woocommerce_product_type'] === $rule['value'] );
-	}
-	elseif($rule['operator'] == "!=") {
-		$match = ( $options['woocommerce_product_type'] !== $rule['value'] );
-	}
-
-	return $match;
-}
-
 function rule_match_woocommerce_bools($match, $rule, $options) {
 	$post_type = $options['post_type'];
-
 	if(!$post_type) {
 		if(!$options['post_id']) {
 			return false;
@@ -158,25 +116,20 @@ function rule_match_woocommerce_bools($match, $rule, $options) {
 		
 		$post_type = get_post_type($options['post_id']);
 	}
-
 	// Ensure is a product
 	if( $post_type != 'product') {
 		return false;
 	}
-
 	if(!array_key_exists('woocommerce_is_virtual', $options) && !array_key_exists('value', $rule)) {
 		return false;
 	}
-
 	$key = 'woocommerce_' . $rule['value'];
-
 	if($rule['operator'] == "==") {
 		$match = ( $options[$key] === 1 );
 	}
 	elseif($rule['operator'] == "!=") {
 		$match = ( $options[$key] !== 1 );
 	}
-
 	return $match;
 }
 
